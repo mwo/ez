@@ -80,9 +80,12 @@ document.addEventListener('keydown', function (e) {
 	if (!isChat() && e.key == 'n') {
 		window[esp] = !window[esp]
 	}
-	if (!isChat() && e.key == 'y') {
-		window.ws.send('p')
-	}
+})
+document.addEventListener('mouseup', function(e){
+    if (e.button == 4) {
+        console.log('requested player data')
+        window.ws.send('p')
+    }
 })
 
 //make hooks
