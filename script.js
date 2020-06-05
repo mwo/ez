@@ -93,4 +93,4 @@ var original_Function = Function;
 var hook_Function = new Proxy(Function, handler);
 conceal_function(original_Function, hook_Function);
 Function = hook_Function;
-//window.activeHacker = true
+window.activeHacker = true
