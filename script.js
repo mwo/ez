@@ -1,5 +1,4 @@
 (function () {
-    'use strict';
 
     const replace = String.prototype.replace;
 
@@ -13,21 +12,22 @@
 
     const varNames = (l, s) => [...Array(s)].map(e => GenString(l))
     /*--------------------------------------------------------------------------------------*/
-    let [esp, sockets] = varNames(8, 2)
+    let [esp, inView, arg] = varNames(8, 3)
     window[esp] = false
 
     let initialize = function (data) {
         let regex = /if\(!\w+\['(\w+)']\)continue/;
         let result = regex.exec(data);
         if (result) {
-            const inView = result[1];
+            window[inView] = result[1];
             const push = Array.prototype.push;
             Array.prototype.push = function (...args) {
                 push.apply(this, args);
                 if (args[0] instanceof Object && args[0].isPlayer) {
+                    window[arg] = args[0];
                     Object.defineProperty(args[0], inView, {
                         value: window[esp],
-                        configurable: false
+                        configurable: true
                     });
                 }
             }
@@ -47,7 +47,10 @@
     document.addEventListener('keydown', function (e) {
         if (!isChat() && e.key == 'n') {
             window[esp] = !window[esp]
+            Object.defineProperty(window[arg], inView, {
+                value: window[esp],
+                configurable: true
+            });
         }
     })
 })();
-//window.activeHacker = true
