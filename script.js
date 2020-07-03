@@ -1,14 +1,3 @@
-// ==UserScript==
-// @name         Krunker NameTags
-// @namespace    https://skidlamer.github.io/
-// @version      0.1
-// @description  self leak
-// @author       SkidLamer
-// @match        *://krunker.io/*
-// @run-at       document-start
-// @grant        none
-// ==/UserScript==
-
 (function () {
 
     function isChat() {
