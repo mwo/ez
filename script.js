@@ -25,7 +25,7 @@
                     window[arg] = args[0];
                     Object.defineProperty(window[arg], window[inView], {
                         get: () => window[esp],
-                        configurable: true
+                        configurable: false
                     });
                 }
             }
