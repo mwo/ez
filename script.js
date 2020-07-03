@@ -1,6 +1,15 @@
-(function () {
+// ==UserScript==
+// @name         Krunker NameTags
+// @namespace    https://skidlamer.github.io/
+// @version      0.1
+// @description  self leak
+// @author       SkidLamer
+// @match        *://krunker.io/*
+// @run-at       document-start
+// @grant        none
+// ==/UserScript==
 
-    const replace = String.prototype.replace;
+(function () {
 
     function isChat() {
         let _8 = "INPUT",
@@ -25,8 +34,8 @@
                 push.apply(this, args);
                 if (args[0] instanceof Object && args[0].isPlayer) {
                     window[arg] = args[0];
-                    Object.defineProperty(args[0], inView, {
-                        value: window[esp],
+                    Object.defineProperty(window[arg], window[inView], {
+                        get: () => window[esp],
                         configurable: true
                     });
                 }
@@ -47,10 +56,6 @@
     document.addEventListener('keydown', function (e) {
         if (!isChat() && e.key == 'n') {
             window[esp] = !window[esp]
-            Object.defineProperty(window[arg], inView, {
-                value: window[esp],
-                configurable: true
-            });
         }
     })
 })();
