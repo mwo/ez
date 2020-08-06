@@ -10,41 +10,40 @@
 
     const varNames = (l, s) => [...Array(s)].map(e => GenString(l))
     /*--------------------------------------------------------------------------------------*/
-    let [esp, inView, arg] = varNames(8, 3)
+    let [esp, inView, plist] = varNames(8, 4)
     window[esp] = false
 
     let initialize = function (data) {
         let regex = /if\(!\w+\['(\w+)']\)continue/;
+        let hook2 = /\['team']:window\['(\w+)']/;
+
+        let hook = hook2.exec(data)[1];
         let result = regex.exec(data);
-        if (result) {
-            window[inView] = result[1];
-            const push = Array.prototype.push;
-            Array.prototype.push = function (...args) {
-                push.apply(this, args);
-                if (args[0] instanceof Object && args[0].isPlayer) {
-                    window[arg] = args[0];
-                    Object.defineProperty(window[arg], window[inView], {
-                        get: () => window[esp],
-                        configurable: false
-                    });
-                }
-            }
-        }
+        window.__defineGetter__(hook,function(){
+            let caller = arguments.callee.caller.arguments;
+            if (caller.length == 8) window[plist] = caller[1];
+            return false;
+        })
+        if (result) window[inView] = result[1];
     }
 
-    const decode = window.TextDecoder.prototype.decode;
-    window.TextDecoder.prototype.decode = function (...args) {
-        let data = decode.apply(this, args);
-        if (data.length > 1050000) {
-            initialize(data);
-        }
-        return data;
-    }
+    window.__defineSetter__('dx724',function(){
+        initialize(arguments.callee.caller.toString());
+    })
+    window.__defineGetter__('dx724',()=>3676159); //function length, used to check for changes. But they have doo doo brain
 
     //keydown listener for keybinds
     document.addEventListener('keydown', function (e) {
         if (!isChat() && e.key == 'n') {
             window[esp] = !window[esp]
+            if (window[plist] && window[plist].players && window[plist].players.list) {
+                window[plist].players.list.forEach(e=>{
+                    Object.defineProperty(e, window[inView], {
+                        get: () => window[esp],
+                        configurable: true
+                    });
+               })
+           }
         }
     })
 })();
