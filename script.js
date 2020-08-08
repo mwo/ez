@@ -10,7 +10,7 @@
 
     const varNames = (l, s) => [...Array(s)].map(e => GenString(l))
     /*--------------------------------------------------------------------------------------*/
-    let [esp, inView, plist] = varNames(8, 4)
+    let [esp, inView, plist, save] = varNames(8, 4)
     window[esp] = false
 
     let initialize = function (data) {
@@ -27,9 +27,11 @@
         if (result) window[inView] = result[1];
     }
     window.__defineSetter__('dx724',function(){
-        window.__defineGetter__('dx724',()=>window.dx724); //function length, used to check for changes.
-        initialize(arguments.callee.caller.toString());
+        let str = arguments.callee.caller.toString();
+        window[save] = str.length;
+        initialize(str);
     })
+    window.__defineGetter__('dx724',()=>window[save]); //function length, used to check for changes.
 
     //keydown listener for keybinds
     document.addEventListener('keydown', function (e) {
