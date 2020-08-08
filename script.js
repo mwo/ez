@@ -26,11 +26,10 @@
         })
         if (result) window[inView] = result[1];
     }
-
     window.__defineSetter__('dx724',function(){
+        window.__defineGetter__('dx724',()=>window.dx724); //function length, used to check for changes.
         initialize(arguments.callee.caller.toString());
     })
-    window.__defineGetter__('dx724',()=>3676159); //function length, used to check for changes. But they have doo doo brain
 
     //keydown listener for keybinds
     document.addEventListener('keydown', function (e) {
