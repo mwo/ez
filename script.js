@@ -19,6 +19,7 @@
 
         let hook = hook2.exec(data)[1];
         let result = regex.exec(data);
+        console.log(hook, result);
         window.__defineGetter__(hook,function(){
             let caller = arguments.callee.caller.arguments;
             if (caller.length == 8) window[plist] = caller[1];
