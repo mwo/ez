@@ -31,30 +31,31 @@
         if (result && hook) window[inView] = result[1];
         console.log(hook, result[1]);
 
-        __define__('get', hook[1], function(){
+        __define__('get', hook[1], function () {
             let caller = arguments.callee.caller.arguments;
             if (caller.length == 8) window.plist = window[plist] = caller[1];
             return false;
         })
     }
-    __define__('set', 'dx724', function(){
+    __define__('set', 'dx724', function () {
         let str = arguments.callee.caller.toString();
         window[save] = str.length;
         initialize(str);
     })
-    __define__('get', 'dx724', ()=>window[save]) //function length, used to check for changes.
+    __define__('get', 'dx724', () => window[save]) //function length, used to check for changes.
 
     //keydown listener for keybinds
     document.addEventListener('keydown', function (e) {
         if (!isChat() && e.key == 'n') {
             window[esp] = !window[esp]
             if (window[plist] && window[plist].players && window[plist].players.list) {
-                window[plist].players.list.forEach(e=>{
+                window[plist].players.list.forEach(e => {
                     Object.defineProperty(e, window[inView], {
                         get: () => window[esp],
                         configurable: true
                     });
-               })
-           }
+                })
+            }
         }
     })
+})();
