@@ -10,9 +10,17 @@
 
     const varNames = (l, s) => [...Array(s)].map(e => GenString(l))
     /*--------------------------------------------------------------------------------------*/
-    let [esp, inView, plist, save, define] = varNames(8, 6);
+    let [esp, inView, plist, save, define] = varNames(8, 5);
     window[define] = Object.defineProperty;
     window[esp] = false
+
+    //create our own function using non depericated function
+    let __define__ = function (str, prop, func, bool = true) {
+        window[define](globalThis, prop, {
+            [str]: func,
+            configurable: bool
+        })
+    }
 
     let initialize = function (data) {
         let regex = /if\(!\w+\['(\w+)']\)continue/;
@@ -23,27 +31,18 @@
         if (result && hook) window[inView] = result[1];
         console.log(hook, result[1]);
 
-        window[define](globalThis, hook[1], {
-            get: function(){
-                let caller = arguments.callee.caller.arguments;
-                if (caller.length == 8) window.plist = window[plist] = caller[1];
-                return false;
-            },
-            configurable: true
+        __define__('get', hook[1], function(){
+            let caller = arguments.callee.caller.arguments;
+            if (caller.length == 8) window.plist = window[plist] = caller[1];
+            return false;
         })
     }
-    window[define](globalThis, 'dx724', {
-        set: function(){
-            let str = arguments.callee.caller.toString();
-            window[save] = str.length;
-            initialize(str);
-        },
-        configurable: true
+    __define__('set', 'dx724', function(){
+        let str = arguments.callee.caller.toString();
+        window[save] = str.length;
+        initialize(str);
     })
-    window[define](globalThis, 'dx724', {
-        get: ()=>window[save], //function length, used to check for changes.
-        configurable: true
-    })
+    __define__('get', 'dx724', ()=>window[save]) //function length, used to check for changes.
 
     //keydown listener for keybinds
     document.addEventListener('keydown', function (e) {
