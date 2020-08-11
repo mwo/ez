@@ -10,29 +10,40 @@
 
     const varNames = (l, s) => [...Array(s)].map(e => GenString(l))
     /*--------------------------------------------------------------------------------------*/
-    let [esp, inView, plist, save] = varNames(8, 4)
+    let [esp, inView, plist, save, define] = varNames(8, 6);
+    window[define] = Object.defineProperty;
     window[esp] = false
 
     let initialize = function (data) {
         let regex = /if\(!\w+\['(\w+)']\)continue/;
         let hook2 = /\['team']:window\['(\w+)']/;
 
-        let hook = hook2.exec(data)[1];
+        let hook = hook2.exec(data);
         let result = regex.exec(data);
-        console.log(hook, result);
-        window.__defineGetter__(hook,function(){
-            let caller = arguments.callee.caller.arguments;
-            if (caller.length == 8) window[plist] = caller[1];
-            return false;
+        if (result && hook) window[inView] = result[1];
+        console.log(hook, result[1]);
+
+        window[define](globalThis, hook[1], {
+            get: function(){
+                let caller = arguments.callee.caller.arguments;
+                if (caller.length == 8) window.plist = window[plist] = caller[1];
+                return false;
+            },
+            configurable: true
         })
-        if (result) window[inView] = result[1];
     }
-    window.__defineSetter__('dx724',function(){
-        let str = arguments.callee.caller.toString();
-        window[save] = str.length;
-        initialize(str);
+    window[define](globalThis, 'dx724', {
+        set: function(){
+            let str = arguments.callee.caller.toString();
+            window[save] = str.length;
+            initialize(str);
+        },
+        configurable: true
     })
-    window.__defineGetter__('dx724',()=>window[save]); //function length, used to check for changes.
+    window[define](globalThis, 'dx724', {
+        get: ()=>window[save], //function length, used to check for changes.
+        configurable: true
+    })
 
     //keydown listener for keybinds
     document.addEventListener('keydown', function (e) {
@@ -48,4 +59,3 @@
            }
         }
     })
-})();
