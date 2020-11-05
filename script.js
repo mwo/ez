@@ -23,19 +23,14 @@
     }
 
     let initialize = function (data) {
-        let regex = /if\(!\w+\['(\w+)']\)continue/;
-        let hook2 = /\['team']:window\['(\w+)']/;
+        let hook = "spectating";
 
-        let hook = hook2.exec(data);
-        let result = regex.exec(data);
-        if (result && hook) window[inView] = result[1];
-        console.log(hook, result[1]);
-
-        __define__('get', hook[1], function () {
+        __define__('get', hook, function () {
             let caller = arguments.callee.caller.arguments;
             if (caller.length == 8) window.plist = window[plist] = caller[1];
             return false;
         })
+        window[inView] = "cnBSeen";
     }
     __define__('set', 'dx724', function () {
         let str = arguments.callee.caller.toString();
