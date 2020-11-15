@@ -23,14 +23,14 @@
     }
 
     let initialize = function (data) {
-        let hook = "spectating";
+        let hook = data.match(/\['team']:window\['(\w+)']/)[1]; //"spectating";
 
         __define__('get', hook, function () {
             let caller = arguments.callee.caller.arguments;
             if (caller.length == 8) window.plist = window[plist] = caller[1];
             return false;
         })
-        window[inView] = "cnBSeen";
+        window[inView] = data.match(/if\(!\w+\['(\w+)']\)continue/)[1] //"cnBSeen";
     }
     __define__('set', 'dx724', function () {
         let str = arguments.callee.caller.toString();
