@@ -24,13 +24,12 @@
 
     let initialize = function (data) {
         let hook = data.match(/\['team']:window\['(\w+)']/)[1]; //"spectating";
-
         __define__('get', hook, function () {
             let caller = arguments.callee.caller.arguments;
             if (caller.length == 8) window.plist = window[plist] = caller[1];
             return false;
         })
-        window[inView] = data.match(/if\(!\w+\['(\w+)']\)continue/)[1] //"cnBSeen";
+        //window[inView] = data.match(/if\(!\w+\['(\w+)']\)continue/)[1];
     }
     __define__('set', 'dx724', function () {
         let str = arguments.callee.caller.toString();
@@ -42,9 +41,11 @@
     //keydown listener for keybinds
     document.addEventListener('keydown', function (e) {
         if (!isChat() && e.key == 'n') {
+            localStorage.spectating = Object.getOwnPropertyNames(window)[1030];
             window[esp] = !window[esp]
             if (window[plist] && window[plist].players && window[plist].players.list) {
                 window[plist].players.list.forEach(e => {
+                    window[inView] = Object.keys(e)[194];
                     Object.defineProperty(e, window[inView], {
                         get: () => window[esp],
                         configurable: true
@@ -53,4 +54,3 @@
             }
         }
     })
-})();
