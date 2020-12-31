@@ -1,57 +1,72 @@
-(function () {
-
+//my old hook still works lol
+(function(){
     function isChat() {
         let _8 = "INPUT",
             _3 = document.activeElement.tagName;
         return _8 === _3;
     }
 
-    const GenString = l => [...Array(l)].map(e => String.fromCharCode((r = Math.random, a = r() * 2 | 0 ? 65 : 97, r() * (a + 25 - a + 1) | 0 + a))).join('')
+    let GenString = l => [...Array(l)].map(e => String.fromCharCode((r = Math.random, a = r() * 2 | 0 ? 65 : 97, r() * (a + 25 - a + 1) | 0 + a))).join('')
 
-    const varNames = (l, s) => [...Array(s)].map(e => GenString(l))
-    /*--------------------------------------------------------------------------------------*/
-    let [esp, inView, plist, save, define] = varNames(8, 5);
-    window[define] = Object.defineProperty;
-    window[esp] = false
+    let varNames = (l, s) => [...Array(s)].map(e => GenString(l));
 
-    //create our own function using non depericated function
-    let __define__ = function (str, prop, func, bool = true) {
-        window[define](globalThis, prop, {
-            [str]: func,
-            configurable: bool
-        })
-    }
+    let esp = GenString(8);
 
-    let initialize = function (data) {
-        let hook = data.match(/\['team']:window\['(\w+)']/)[1]; //"spectating";
-        __define__('get', hook, function () {
-            let caller = arguments.callee.caller.arguments;
-            if (caller.length == 8) window.plist = window[plist] = caller[1];
-            return false;
-        })
-        //window[inView] = data.match(/if\(!\w+\['(\w+)']\)continue/)[1];
-    }
-    __define__('set', 'dx724', function () {
-        let str = arguments.callee.caller.toString();
-        window[save] = str.length;
-        initialize(str);
-    })
-    __define__('get', 'dx724', () => window[save]) //function length, used to check for changes.
+    window[esp] = false;
 
-    //keydown listener for keybinds
     document.addEventListener('keydown', function (e) {
         if (!isChat() && e.key == 'n') {
-            localStorage.spectating = Object.getOwnPropertyNames(window)[1030];
             window[esp] = !window[esp]
-            if (window[plist] && window[plist].players && window[plist].players.list) {
-                window[plist].players.list.forEach(e => {
-                    window[inView] = Object.keys(e)[194];
-                    Object.defineProperty(e, window[inView], {
-                        get: () => window[esp],
-                        configurable: true
-                    });
-                })
-            }
         }
     })
-})
+
+    function conceal_function(original_Function, hook_Function) {
+        var anti_map = [];
+        var original_toString = Function.prototype.toString;
+
+        function hook_toString(...args) {
+            for (var i = 0; i < anti_map.length; i++) {
+                if (anti_map[i].from === this) {
+                    return anti_map[i].to;
+                }
+            }
+            return original_toString.apply(this, args);
+        }
+
+        anti_map.push({
+            from: hook_Function,
+            to: original_Function.toString()
+        });
+        anti_map.push({
+            from: hook_toString,
+            to: original_toString.toString()
+        });
+        Function.prototype.toString = hook_toString;
+    };
+
+    let handler = {
+        construct(target, args) {
+            let ff = []
+            args.find((..._) => {
+                let a = _[0].length > 1e6
+                if (a) {
+                    ff = [_[0], _[1], args];
+                    return a
+                }
+            })
+            if (ff[0]) {
+                var code = args[ff[1]];
+                code = code.replace(/if\((\([0-9a-zA-Z!\[\]'&=]+\)[0-9a-zA-Z!\[\]'&=]+\(![0-9a-zA-Z!\[\]'&|=]+\))([0-9a-zA-Z!\[\]'&|=]+)\)/,function(_,$1,$2){
+                    return "if(" + $1 + "&& !window." + esp + "?" + $2.slice(2) + ":" + $2.slice(2).split('&&').slice(0,-1).join('&&') + ")";
+                });
+                args[ff[1]] = code;
+            }
+            return new target(...args);
+        }
+    };
+
+    let original_Function = Function;
+    let hook_Function = new Proxy(Function, handler);
+    conceal_function(original_Function, hook_Function);
+    Function = hook_Function;
+});
